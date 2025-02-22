@@ -1,0 +1,24 @@
+from rest_framework_simplejwt.views import TokenRefreshView
+from django.urls import path
+from api import views
+
+
+urlpatterns = [
+    path("token/", views.TokenView.as_view(), name="token-pair"),
+    path("token/refresh/", TokenRefreshView.as_view(), name="token-refresh"),
+    path("register/", views.RegisterView.as_view(), name="register"),
+    path("dashboard/", views.dashboard, name="dashboard"),
+
+
+    path("todo/<user_id>/", views.TodoListView.as_view(), name="todo"),
+    path("todo-detail/<user_id>/<task_id>/", views.TodoDetailView.as_view(), name="todo-detail"),
+    path("todo-completed/<user_id>/<task_id>/", views.TodoCompletedView.as_view(), name="todo-completed"),
+
+    path("my-messages/<user_id>/", views.Inbox.as_view(), name="inbox"),
+    path("get-messages/<sender_id>/<receiver_id>/", views.GetMessagesView.as_view(), name="messages"),
+    path("send-message/", views.SendMessage.as_view(), name="send"),
+    path("profile/<int:pk>/", views.ProfileDetailView.as_view(), name="profile"),
+    path("search/<username>/", views.UserSearch.as_view(), name="search"),
+
+
+]
