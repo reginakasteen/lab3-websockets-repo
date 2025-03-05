@@ -23,15 +23,19 @@ class User(AbstractUser):
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
-    gender = models.CharField(choices=GENDER, max_length=10)
-    date_of_birth = models.DateField(null=True)
-    bio = models.CharField(max_length=500)
-    photo = models.ImageField(default="default_image.png", upload_to="user_images")
+    gender = models.CharField(choices=GENDER, max_length=10, null=True, blank=True)
+    date_of_birth = models.DateField(null=True, blank=True)
+    bio = models.CharField(max_length=500, null=True)
+    photo = models.ImageField(default="default_image.jpg", upload_to="user_images", blank=True, null=True)
     is_online = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name
     
+    def save(self, *args, **kwargs):
+        if self.name == '' or self.name == None:
+            self.name = self.user.username
+        super(Profile, self).save(*args, **kwargs)
 
 def create_profile(sender, instance, created, **kwargs):
     if created:

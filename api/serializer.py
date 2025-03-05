@@ -11,7 +11,7 @@ class UserSerializer(serializers.ModelSerializer):
 class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
-        fields = ['user', 'name', 'gender', 'date_of_birth', 'is_online']
+        fields = ['user', 'name', 'gender', 'date_of_birth', 'is_online', 'photo']
 
 class TokenSerializer(TokenObtainPairSerializer):
     @classmethod
@@ -21,7 +21,7 @@ class TokenSerializer(TokenObtainPairSerializer):
         token['gender'] = user.profile.gender
         token['username'] = user.username
         token['email'] = user.email
-        token['date_of_birth'] = user.profile.date_of_birth
+        token['date_of_birth'] = user.profile.date_of_birth.isoformat() if user.profile.date_of_birth else None
         token['is_online'] = user.profile.is_online
         token['bio'] = user.profile.bio
         token['photo'] = str(user.profile.photo)
@@ -66,7 +66,7 @@ class TaskSerializer(serializers.ModelSerializer):
 class MessageSerializer(serializers.ModelSerializer):
     receiver_profile = ProfileSerializer(read_only=True)
     sender_profile = ProfileSerializer(read_only=True)
-
+    date = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S", read_only=True)
     class Meta:
         model = Message
         fields = ['id', 'user', 'sender', 'receiver', 'sender_profile', 'receiver_profile', 'message', 'date', 'is_read']    
