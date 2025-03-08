@@ -1,7 +1,10 @@
 from rest_framework_simplejwt.views import TokenRefreshView
 from django.urls import path
-from api import views
 from drf_spectacular.views import SpectacularRedocView, SpectacularAPIView
+from django.conf import settings
+from django.conf.urls.static import static
+
+from api import views
 
 
 
@@ -10,6 +13,8 @@ urlpatterns = [
     path("token/refresh/", TokenRefreshView.as_view(), name="token-refresh"),
     path("register/", views.RegisterView.as_view(), name="register"),
     path("profile/", views.UserProfileView.as_view(), name="profile"),
+    path('set-online/', views.set_online, name='set-online'),
+    path('set-offline/', views.set_offline, name='set-offline'),
 
 
     path("todo/<user_id>/", views.TodoListView.as_view(), name="todo"),
@@ -25,6 +30,9 @@ urlpatterns = [
 
     path("schema/", SpectacularAPIView.as_view(), name="schema"),
     path("redoc/", SpectacularRedocView.as_view(url_name="schema"), name="redoc"),
-
-
 ]
+
+
+if settings.DEBUG:
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+

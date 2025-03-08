@@ -7,7 +7,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
 
-from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import extend_schema, OpenApiResponse
 
 from api.models import User, Profile, Task, Message
 from api.serializer import UserSerializer, TokenSerializer, RegisterSerializer, TaskSerializer, ProfileSerializer, MessageSerializer
@@ -46,9 +46,25 @@ class RegisterView(generics.CreateAPIView):
     serializer_class = RegisterSerializer
 
 
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def set_online(request):
+    profile = Profile.objects.get(user=request.user)
+    profile.is_online = True
+    profile.save()
+    return Response({"message": "User is now online"}, status=200)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def set_offline(request):
+    profile = Profile.objects.get(user=request.user)
+    profile.is_online = False
+    profile.save()
+    return Response({"message": "User is now offline"}, status=200)
+    
+
 @extend_schema(
     summary="Test View",
-
 )
 @api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])
@@ -347,10 +363,52 @@ class UserSearch(generics.ListAPIView):
         serializer = self.get_serializer(users, many=True)
         return Response(serializer.data)
     
+
+
+@extend_schema(
+    responses={
+        200: ProfileSerializer,
+        404: OpenApiResponse(description="Profile not found")
+    },
+    request=ProfileSerializer,
+    description="Endpoint for getting and updating user profile."
+)
 class UserProfileView(APIView):
+
+    """
+    User Profile View
+
+    This endpoint provides access to the current user's profile. 
+    Users can retrieve their profile data via GET request and 
+    update their profile with a PUT request.
+
+    ## GET Request
+    Fetch the current user's profile details.
+
+    ## PUT Request
+    Update the current user's profile details. The request body can contain any 
+    subset of the profile fields. If the field is not provided, it will not be updated.
+    """
+
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
+        """
+        Get the current user's profile.
+
+        **Response Fields**:
+        - `id`: The unique ID of the profile.
+        - `name`: The name of the user.
+        - `gender`: The gender of the user.
+        - `date_of_birth`: The user's birthdate.
+        - `bio`: The biography of the user.
+        - `photo`: The photo URL of the user.
+        - `is_online`: The current online status of the user.
+
+        **Responses**:
+        - 200 OK: The user's profile data.
+        - 404 Not Found: The profile for the user does not exist.
+        """
         try:
             profile = Profile.objects.get(user=request.user)
             serializer = ProfileSerializer(profile)
@@ -359,6 +417,43 @@ class UserProfileView(APIView):
             return Response({"detail": "Profile not found"}, status=404)
 
     def put(self, request):
+        """
+        Update the current user's profile.
+
+        The request body can include the following fields:
+        - `name`: The name of the user (optional).
+        - `gender`: The gender of the user (optional).
+        - `date_of_birth`: The birthdate of the user (optional).
+        - `bio`: The biography of the user (optional).
+        - `photo`: The new photo URL (optional).
+        - `is_online`: The online status of the user (optional).
+
+        **Responses**:
+        - 200 OK: Successfully updated profile data.
+        - 400 Bad Request: The data provided is invalid.
+        - 404 Not Found: Profile does not exist.
+
+        **Example Request**:
+        ```json
+        {
+          "name": "New Name",
+          "bio": "Updated bio"
+        }
+        ```
+
+        **Example Response**:
+        ```json
+        {
+          "id": 1,
+          "name": "New Name",
+          "gender": "Male",
+          "date_of_birth": "1990-01-01",
+          "bio": "Updated bio",
+          "photo": "new-photo-url.jpg",
+          "is_online": true
+        }
+        ```
+        """
         try:
             profile = Profile.objects.get(user=request.user)
         except Profile.DoesNotExist:
@@ -371,11 +466,34 @@ class UserProfileView(APIView):
         return Response(serializer.errors, status=400)
     
 
+@extend_schema(
+    responses={
+        200: ProfileSerializer,
+        404: OpenApiResponse(description="Profile not found")
+    },
+    description="Retrieve the profile of a user by their ID."
+)
 class ProfileView(generics.RetrieveAPIView):
+    """
+    Retrieve a Specific User Profile
+
+    This endpoint retrieves a user's profile based on their `user_id`.
+
+    **GET Request**
+    Retrieve a user's profile by providing the `user_id` parameter.
+    """
     queryset = Profile.objects.all()
     serializer_class = ProfileSerializer
     permission_classes = [IsAuthenticated]
 
     def get_object(self):
+        """
+        Retrieve the profile object based on the user ID from the URL.
+        
+        **Responses**:
+        - 200 OK: The user's profile data.
+        - 404 Not Found: Profile for the specified user ID does not exist.
+        """
         user_id = self.kwargs.get("user_id")
         return get_object_or_404(Profile, user__id=user_id)
+    
