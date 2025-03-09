@@ -93,11 +93,29 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
+# DATABASES = {
+#     'default': dj_database_url.config(default=os.getenv('DATABASE_URL'))
+
+# }
+
+
+# DATABASES = {
+#     'default': dj_database_url.config(default=os.environ.get('Postgres.DATABASE_URL'),conn_max_age=1800)
+# }
+
+
 DATABASES = {
-    'default': dj_database_url.config(default=os.getenv('DATABASE_URL'))
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.postgresql',
+    #     'NAME': 'railway',
+    #     'USER': 'postgres',
+    #     'PASSWORD': 'zrvzKClyBhEgsKJqBwrJPoIJJfHgyZzX',
+    #     'HOST': 'hopper.proxy.rlwy.net',
+    #     'PORT': '26626',
+    # }
+        'default': dj_database_url.config(default=os.getenv('DATABASE_URL'))
 
 }
-
 
 
 # Password validation
@@ -183,5 +201,12 @@ SIMPLE_JWT = {
     'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
 }
 
-CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_ALL_ORIGINS = False
+CORS_ALLOWED_ORIGINS = [
+    "https://chat-front-ruddy.vercel.app", 
+    "http://localhost:5173", 
+]
+ALLOWED_HOSTS = ["energetic-respect.up.railway.app", "chat-front-ruddy.vercel.app", 'chat-back-production-139c.up.railway.app', 'localhost', '127.0.0.1']
+
 AUTH_USER_MODEL = 'api.User'
+CORS_ALLOW_CREDENTIALS = True 
