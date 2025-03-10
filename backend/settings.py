@@ -15,6 +15,8 @@ from datetime import timedelta
 import os
 import dj_database_url
 
+print(os.getenv('DATABASE_URL'))
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -105,15 +107,15 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 
 
 DATABASES = {
-    # 'default': {
-    #     'ENGINE': 'django.db.backends.postgresql',
-    #     'NAME': 'railway',
-    #     'USER': 'postgres',
-    #     'PASSWORD': 'zrvzKClyBhEgsKJqBwrJPoIJJfHgyZzX',
-    #     'HOST': 'hopper.proxy.rlwy.net',
-    #     'PORT': '26626',
-    # }
-        'default': dj_database_url.config(default=os.getenv('DATABASE_URL'))
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'railway',
+        'USER': 'postgres',
+        'PASSWORD': 'YjbzRxoxSByUvDWihKHJBznzpJputWkk',
+        'HOST': 'nozomi.proxy.rlwy.net',
+        'PORT': '59805',
+    }
+        # 'default': dj_database_url.config(default=os.getenv('DATABASE_URL'))
 
 }
 
