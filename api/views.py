@@ -473,27 +473,20 @@ class UserProfileView(APIView):
     },
     description="Retrieve the profile of a user by their ID."
 )
-class ProfileView(generics.RetrieveAPIView):
-    """
-    Retrieve a Specific User Profile
-
-    This endpoint retrieves a user's profile based on their `user_id`.
-
-    **GET Request**
-    Retrieve a user's profile by providing the `user_id` parameter.
-    """
-    queryset = Profile.objects.all()
-    serializer_class = ProfileSerializer
+class ProfileView(APIView):
     permission_classes = [IsAuthenticated]
 
-    def get_object(self):
-        """
-        Retrieve the profile object based on the user ID from the URL.
-        
-        **Responses**:
-        - 200 OK: The user's profile data.
-        - 404 Not Found: Profile for the specified user ID does not exist.
-        """
-        user_id = self.kwargs.get("user_id")
-        return get_object_or_404(Profile, user__id=user_id)
+    def get(self, request):
+        user = request.user
+        profile = user.profile
+
+        return Response({
+            "name": profile.name,
+            "gender": profile.gender,
+            "email": user.email,
+            "date_of_birth": profile.date_of_birth.isoformat() if profile.date_of_birth else None,
+            "is_online": profile.is_online,
+            "bio": profile.bio,
+            "photo": str(profile.photo),
+        })
     

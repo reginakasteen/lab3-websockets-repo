@@ -15,8 +15,6 @@ from datetime import timedelta
 import os
 import dj_database_url
 
-print(os.getenv('DATABASE_URL'))
-
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -29,7 +27,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'django-insecure-4-s(8p8m4l9d^)iac88q1$6iutso2t*g@dlao2m#x0$)9w%rpu')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('DJANGO_DEBUG', 'False') == 'True'
+DEBUG = True
 
 ALLOWED_HOSTS = []
 
@@ -95,27 +93,26 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-# DATABASES = {
-#     'default': dj_database_url.config(default=os.getenv('DATABASE_URL'))
-
-# }
-
-
-# DATABASES = {
-#     'default': dj_database_url.config(default=os.environ.get('Postgres.DATABASE_URL'),conn_max_age=1800)
-# }
-
 
 DATABASES = {
+
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'railway',
+        'NAME': 'mynet_database',
         'USER': 'postgres',
-        'PASSWORD': 'YjbzRxoxSByUvDWihKHJBznzpJputWkk',
-        'HOST': 'nozomi.proxy.rlwy.net',
-        'PORT': '59805',
+        'PASSWORD': 'password',
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
-        # 'default': dj_database_url.config(default=os.getenv('DATABASE_URL'))
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.postgresql',
+    #     'NAME': 'railway',
+    #     'USER': 'postgres',
+    #     'PASSWORD': 'YjbzRxoxSByUvDWihKHJBznzpJputWkk',
+    #     'HOST': 'nozomi.proxy.rlwy.net',
+    #     'PORT': '59805',
+    # }
+    # 'default': dj_database_url.config(default=os.getenv('DATABASE_URL'))
 
 }
 
@@ -160,6 +157,9 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+WHITENOISE_USE_FINDERS = True
+
 
 
 # Default primary key field type
@@ -207,8 +207,20 @@ CORS_ALLOW_ALL_ORIGINS = False
 CORS_ALLOWED_ORIGINS = [
     "https://chat-front-ruddy.vercel.app", 
     "http://localhost:5173", 
+    "https://chat-back-production-1153.up.railway.app",
 ]
-ALLOWED_HOSTS = ["energetic-respect.up.railway.app", "chat-front-ruddy.vercel.app", 'chat-back-production-139c.up.railway.app', 'localhost', '127.0.0.1']
+CSRF_TRUSTED_ORIGINS = [
+    "https://chat-back-production-1153.up.railway.app",
+    "https://chat-front-ruddy.vercel.app",
+]
+
+ALLOWED_HOSTS = [
+    "chat-back-production-1153.up.railway.app", 
+    "chat-front-ruddy.vercel.app", 
+    'chat-back-production-139c.up.railway.app', 
+    'localhost', 
+    '127.0.0.1'
+]
 
 AUTH_USER_MODEL = 'api.User'
 CORS_ALLOW_CREDENTIALS = True 

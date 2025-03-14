@@ -13,20 +13,15 @@ class ProfileSerializer(serializers.ModelSerializer):
         model = Profile
         fields = ['id', 'user', 'name', 'gender', 'bio', 'date_of_birth', 'is_online', 'photo']
 
+
 class TokenSerializer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, user):
         token = super().get_token(user)
-        token['name'] = user.profile.name
-        token['gender'] = user.profile.gender
+        token['user_id'] = user.id
         token['username'] = user.username
-        token['email'] = user.email
-        token['date_of_birth'] = user.profile.date_of_birth.isoformat() if user.profile.date_of_birth else None
-        token['is_online'] = user.profile.is_online
-        token['bio'] = user.profile.bio
-        token['photo'] = str(user.profile.photo)
-
         return token
+
     
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True, validators=[validate_password])
