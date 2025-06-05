@@ -14,6 +14,8 @@ from pathlib import Path
 from datetime import timedelta
 import os
 import dj_database_url
+import sys
+
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -42,6 +44,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'jazzmin',
     'drf_spectacular',
+    'channels',
 
 
     'django.contrib.admin',
@@ -87,7 +90,16 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'backend.wsgi.application'
+ASGI_APPLICATION = 'backend.asgi.application'
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],
+        },
+    },
+}
 
 
 # Database
@@ -100,7 +112,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'mynet_database',
         'USER': 'postgres',
-        'PASSWORD': 'password',
+        'PASSWORD': 'Nobody_password',
         'HOST': 'localhost',
         'PORT': '5432',
     }
@@ -115,6 +127,19 @@ DATABASES = {
     # 'default': dj_database_url.config(default=os.getenv('DATABASE_URL'))
 
 }
+
+
+if 'test' in sys.argv:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': 'mynet_test_database',
+            'USER': 'postgres',
+            'PASSWORD': 'Nobody_password',
+            'HOST': 'localhost',
+            'PORT': '5432',
+        }
+    }
 
 
 # Password validation
@@ -203,23 +228,20 @@ SIMPLE_JWT = {
     'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
 }
 
-CORS_ALLOW_ALL_ORIGINS = False
+CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOWED_ORIGINS = [
     "https://chat-front-ruddy.vercel.app", 
     "http://localhost:5173", 
-    "https://chat-back-production-1153.up.railway.app",
 ]
 CSRF_TRUSTED_ORIGINS = [
-    "https://chat-back-production-1153.up.railway.app",
-    "https://chat-front-ruddy.vercel.app",
+    "http://localhost:5173", 
+    'http://localhost:8000',
 ]
 
 ALLOWED_HOSTS = [
-    "chat-back-production-1153.up.railway.app", 
-    "chat-front-ruddy.vercel.app", 
-    'chat-back-production-139c.up.railway.app', 
+    '127.0.0.1',
     'localhost', 
-    '127.0.0.1'
+    
 ]
 
 AUTH_USER_MODEL = 'api.User'
